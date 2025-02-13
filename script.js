@@ -38,16 +38,26 @@ squares.forEach((square) => {
 
 squares.forEach((square) => {
 
-    square.addEventListener("mouseover", () => {
+    function handleInteraction() {
         if (interactions < 9) {
             interactions++;
             opacityLevel = 1 - (interactions / 10); // Reduce opacity progressively
             square.style.opacity = opacityLevel.toString();
         } else {
-            square.style.opacity = "0"; // No transparency effect on black
+            square.style.opacity = "0"; // Fully transparent square
             interactions = 0;
-            opacityLevel = 1.0; // Resets opacity, so after the 10th black square, 
+            opacityLevel = 1.0; // Resets opacity after the 10th black square
         }
+    }
+
+    // Desktop support
+    square.addEventListener("mouseover", handleInteraction);
+
+    // Mobile support
+    square.addEventListener("touchstart", handleInteraction);
+    square.addEventListener("touchmove", (e) => {
+        e.preventDefault(); // Prevents scrolling while touching
+        handleInteraction();
     });
 });
 
@@ -79,23 +89,42 @@ function newGrid(){
     }
     const squares = document.querySelectorAll(".squares");
     
-        squares.forEach((square) => {
-            square.addEventListener("mouseover", () => {
-            square.style.backgroundColor = getRandomColor();
+    squares.forEach((square) => {
+        function handleInteraction() {
             if (interactions < 9) {
                 interactions++;
                 opacityLevel = 1 - (interactions / 10); // Reduce opacity progressively
                 square.style.opacity = opacityLevel.toString();
             } else {
-                square.style.opacity = "0"; // Fully transparent square.
-                interactions = 0; // Resets the interaction at the 10th square.
-                opacityLevel = 1.0; // Resets opacity after the 10th square, 
+                square.style.opacity = "0"; // Fully transparent square
+                interactions = 0;
+                opacityLevel = 1.0; // Resets opacity after the 10th black square
             }
-            })
+        }
+    
+        // Desktop support
+        
+        square.addEventListener("mouseover", () => {
+            handleInteraction();
+            square.style.backgroundColor = getRandomColor();
         })
+    
+        // Mobile support
+        square.addEventListener("touchstart", () => {
+            handleInteraction();
+            square.style.backgroundColor = getRandomColor();
+        })
+        square.addEventListener("touchmove", (e) => {
+            e.preventDefault(); // Prevents scrolling while touching
+            handleInteraction();
+            square.style.backgroundColor = getRandomColor();
+        });
+    });
 
         
     
 }
+
+
 
 newgrid.addEventListener("click", newGrid);
