@@ -54,10 +54,15 @@ squares.forEach((square) => {
     square.addEventListener("mouseover", handleInteraction);
 
     // Mobile support
-    square.addEventListener("touchstart", handleInteraction);
-    square.addEventListener("touchmove", (e) => {
-        e.preventDefault(); // Prevents scrolling while touching
-        handleInteraction();
+    container.addEventListener("touchmove", (e) => {
+        e.preventDefault(); // Prevent scrolling
+        let touch = e.touches[0];
+        let element = document.elementFromPoint(touch.clientX, touch.clientY);
+        
+        if (element && element.classList.contains("squares")) {
+            element.style.backgroundColor = getRandomColor();
+            handleInteraction(element);
+        }
     });
 });
 
@@ -108,17 +113,20 @@ function newGrid(){
             handleInteraction();
             square.style.backgroundColor = getRandomColor();
         })
-    
-        // Mobile support
-        square.addEventListener("touchstart", () => {
-            handleInteraction();
-            square.style.backgroundColor = getRandomColor();
-        })
-        square.addEventListener("touchmove", (e) => {
-            e.preventDefault(); // Prevents scrolling while touching
-            handleInteraction();
-            square.style.backgroundColor = getRandomColor();
+        
+
+        container.addEventListener("touchmove", (e) => {
+            e.preventDefault(); // Prevent scrolling
+            let touch = e.touches[0];
+            let element = document.elementFromPoint(touch.clientX, touch.clientY);
+            
+            if (element && element.classList.contains("squares")) {
+                element.style.backgroundColor = getRandomColor();
+                handleInteraction(element);
+            }
         });
+
+     
     });
 
         
