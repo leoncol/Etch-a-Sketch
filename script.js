@@ -3,123 +3,111 @@ const newgrid = document.querySelector("#newgrid");
 let initialgrids = 16;
 let realsize = initialgrids * initialgrids;
 let squaresize = 960 / initialgrids;
-let opacityLevel = 1.0; // Start fully visible
-let interactions = 0; // Count interactions
+let totalInteractions = 0; // Track total interactions globally
+let touchedSquares = new Set(); // Track squares that have been interacted with
 
-for(let i = 0; i < realsize; i++){
+// Create the initial grid
+for (let i = 0; i < realsize; i++) {
     const div = document.createElement("div");
     container.appendChild(div);
     div.classList.add("squares");
     div.style.height = squaresize + "px";
     div.style.width = squaresize + "px";
-    div.style.opacity = "1"; // Ensure opacity starts at 1
-    div.dataset.opacity = "1"; // Store opacity in dataset
-
-
-
+    div.style.opacity = "1.0"; // Start fully opaque
 }
 
 const squares = document.querySelectorAll(".squares");
 
 function getRandomColor() {
-    let r = Math.floor(Math.random() * 256); // Random red (0-255)
-    let g = Math.floor(Math.random() * 256); // Random green (0-255)
-    let b = Math.floor(Math.random() * 256); // Random blue (0-255)
-    
-    return `rgb(${r}, ${g}, ${b})`; // Return as a CSS RGB string
+    let r = Math.floor(Math.random() * 256);
+    let g = Math.floor(Math.random() * 256);
+    let b = Math.floor(Math.random() * 256);
+    return `rgb(${r}, ${g}, ${b})`;
 }
 
-squares.forEach((square) => {
-    square.addEventListener("mouseover", () => {
-    square.style.backgroundColor = getRandomColor();
-    })
-})
-
-
-squares.forEach((square) => {
-
-    function handleInteraction() {
-        if (interactions < 9) {
-            interactions++;
-            opacityLevel = 1 - (interactions / 10); // Reduce opacity progressively
-            square.style.opacity = opacityLevel.toString();
+function handleInteraction(square) {
+    if (!touchedSquares.has(square)) {
+        touchedSquares.add(square); // Mark the square as interacted with
+        if (totalInteractions < 10) {
+            totalInteractions++; // Increment total interactions
+            const opacityLevel = 1 - (totalInteractions / 10); // Calculate opacity
+            square.style.opacity = opacityLevel.toString(); // Apply opacity to the square
         } else {
-            square.style.opacity = "0"; // Fully transparent square
-            interactions = 0;
-            opacityLevel = 1.0; // Resets opacity after the 10th black square
+            // Reset after 10 interactions
+            totalInteractions = 0;
+            touchedSquares.clear();
+            square.style.opacity = "1.0"; // Reset to fully visible
         }
+        square.style.backgroundColor = getRandomColor(); // Change color
     }
+}
 
+// Add event listeners for desktop and mobile
+squares.forEach((square) => {
     // Desktop support
-    square.addEventListener("mouseover", handleInteraction);
+    square.addEventListener("mouseover", () => {
+        handleInteraction(square);
+    });
 
     // Mobile support
     square.addEventListener("touchstart", (e) => {
-        e.preventDefault(); // Prevents default touch behaviors
-        square.style.backgroundColor = getRandomColor();
+        e.preventDefault();
         handleInteraction(square);
+    });
+
+    square.addEventListener("touchmove", (e) => {
+        e.preventDefault(); // Prevent scrolling
+        let touch = e.touches[0];
+        let touchedElement = document.elementFromPoint(touch.clientX, touch.clientY);
+        if (touchedElement && touchedElement.classList.contains("squares")) {
+            handleInteraction(touchedElement); // Apply interaction to the touched square
+        }
     });
 });
 
-
-
-function newGrid(){
-    opacityLevel = 1.0; // Start fully visible
-    interactions = 0; // Count interactions
+// Function to create a new grid
+function newGrid() {
     container.innerHTML = "";
     let grids = prompt("Insert the new size. A number not greater than 100, not lesser than 1.");
     while (isNaN(grids) || grids < 1 || grids > 100) {
         grids = prompt("Insert a valid number, not greater than 100, not lesser than 1 to establish the size of the grid");
-        grids = parseInt(initialgrids);
-     }
+    }
     grids = parseInt(grids);
     let realsize = grids * grids;
     squaresize = 960 / grids;
-    for(let i = 0; i < realsize; i++){
+    for (let i = 0; i < realsize; i++) {
         const div = document.createElement("div");
         container.appendChild(div);
         div.classList.add("squares");
         div.style.height = squaresize + "px";
         div.style.width = squaresize + "px";
-
-        
-
-        
-    
-    
+        div.style.opacity = "1.0"; // Start fully opaque
     }
     const squares = document.querySelectorAll(".squares");
-    
+
     squares.forEach((square) => {
-        function handleInteraction() {
-            if (interactions < 9) {
-                interactions++;
-                opacityLevel = 1 - (interactions / 10); // Reduce opacity progressively
-                square.style.opacity = opacityLevel.toString();
-            } else {
-                square.style.opacity = "0"; // Fully transparent square
-                interactions = 0;
-                opacityLevel = 1.0; // Resets opacity after the 10th black square
-            }
-        }
-    
-        // Desktop support
-        
         square.addEventListener("mouseover", () => {
-            handleInteraction();
-            square.style.backgroundColor = getRandomColor();
-        })
-        
-        // Mobile support
-        square.addEventListener("touchstart", (e) => {
-            e.preventDefault(); // Prevents default touch behaviors
-            square.style.backgroundColor = getRandomColor();
             handleInteraction(square);
         });
-    });     
-    
+
+        square.addEventListener("touchstart", (e) => {
+            e.preventDefault();
+            handleInteraction(square);
+        });
+
+        square.addEventListener("touchmove", (e) => {
+            e.preventDefault();
+            let touch = e.touches[0];
+            let touchedElement = document.elementFromPoint(touch.clientX, touch.clientY);
+            if (touchedElement && touchedElement.classList.contains("squares")) {
+                handleInteraction(touchedElement);
+            }
+        });
+    });
+
+    // Reset total interactions and touched squares when creating a new grid
+    totalInteractions = 0;
+    touchedSquares.clear();
 }
-
-
 
 newgrid.addEventListener("click", newGrid);
