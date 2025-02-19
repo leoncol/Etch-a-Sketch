@@ -26,8 +26,8 @@ const squares = document.querySelectorAll(".squares");
 const cursor = document.createElement("img");
 cursor.src = "assets/iconmonstr-eraser-2.svg";
 cursor.style.position = "absolute";
-cursor.style.width = "20px";
-cursor.style.height = "20px";
+cursor.style.width = "100px";
+cursor.style.height = "100px";
 cursor.style.pointerEvents = "none"; // Ensure the cursor doesn't interfere with touch events
 cursor.style.display = "none"; // Initially hidden
 document.body.appendChild(cursor);
